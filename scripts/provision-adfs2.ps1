@@ -10,3 +10,4 @@ Write-Host "Installing ADFS 2"
 & $ExeFile '/quiet' '/norestart'
 
 Write-Host "Status of AdfsSetup = " $LASTEXITCODE
+

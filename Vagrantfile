@@ -1,9 +1,14 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+require File.dirname(__FILE__)+"/dependency_manager"
+
+# Ensure Plugins are available
+check_plugins ["vagrant-reload"]
 
 Vagrant.configure("2") do |config|
   config.vm.define "dc" do |cfg|
-    cfg.vm.box = "windows_2012_r2"
+    config.vm.box = "lookingforlemons/server-2012-r2"
+    config.vm.box_version = "1.0"
     cfg.vm.hostname = "dc"
 
     # use the plaintext WinRM transport and force it to use basic authentication.
@@ -42,7 +47,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "adfs2", autostart: false do |cfg|
-    cfg.vm.box = "windows_2012_r2"
+    config.vm.box = "lookingforlemons/win-2012r2-datacenter"
+    config.vm.box_version = "1.0"
     cfg.vm.hostname = "adfs2"
 
     cfg.vm.communicator = "winrm"
@@ -68,7 +74,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "web", autostart: false do |cfg|
-    cfg.vm.box = "windows_2012_r2"
+    config.vm.box = "lookingforlemons/win-2012r2-datacenter"
+    config.vm.box_version = "1.0"
     cfg.vm.hostname = "web"
 
     cfg.vm.communicator = "winrm"
@@ -98,7 +105,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ps", autostart: false do |cfg|
-    cfg.vm.box = "windows_2012_r2"
+    config.vm.box = "lookingforlemons/win-2012r2-datacenter"
+    config.vm.box_version = "1.0"
     cfg.vm.hostname = "ps"
 
     cfg.vm.communicator = "winrm"
@@ -124,7 +132,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ts", autostart: false do |cfg|
-    cfg.vm.box = "windows_2012_r2"
+    config.vm.box = "lookingforlemons/win-2012r2-datacenter"
+    config.vm.box_version = "1.0"
     cfg.vm.hostname = "ts"
 
     cfg.vm.communicator = "winrm"
