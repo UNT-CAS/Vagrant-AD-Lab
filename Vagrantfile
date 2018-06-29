@@ -5,6 +5,13 @@ require File.dirname(__FILE__)+"/dependency_manager"
 # Ensure Plugins are available
 check_plugins ["vagrant-reload"]
 
+# Returns true if `HEADLESS` environment variable is set to a non-empty value.
+# Defaults to false
+# def gui_enabled?
+  # ENV.fetch('HEADLESS', '').empty?
+# end
+
+
 Vagrant.configure("2") do |config|
   config.vm.define "dc" do |cfg|
     config.vm.box = "lookingforlemons/server-2012-r2"
@@ -47,8 +54,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "adfs2", autostart: false do |cfg|
-    config.vm.box = "lookingforlemons/win-2012r2-datacenter"
-    config.vm.box_version = "1.0"
+    cfg.vm.box = "lookingforlemons/win-2012r2-datacenter"
+    cfg.vm.box_version = "1.0"
     cfg.vm.hostname = "adfs2"
 
     cfg.vm.communicator = "winrm"
@@ -74,8 +81,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "web", autostart: false do |cfg|
-    config.vm.box = "lookingforlemons/win-2012r2-datacenter"
-    config.vm.box_version = "1.0"
+    cfg.vm.box = "lookingforlemons/win-2012r2-datacenter"
+    cfg.vm.box_version = "1.0"
     cfg.vm.hostname = "web"
 
     cfg.vm.communicator = "winrm"
@@ -105,8 +112,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ps", autostart: false do |cfg|
-    config.vm.box = "lookingforlemons/win-2012r2-datacenter"
-    config.vm.box_version = "1.0"
+    cfg.vm.box = "lookingforlemons/win-2012r2-datacenter"
+    cfg.vm.box_version = "1.0"
     cfg.vm.hostname = "ps"
 
     cfg.vm.communicator = "winrm"
@@ -132,8 +139,8 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.define "ts", autostart: false do |cfg|
-    config.vm.box = "lookingforlemons/win-2012r2-datacenter"
-    config.vm.box_version = "1.0"
+    cfg.vm.box = "lookingforlemons/win-2012r2-datacenter"
+    cfg.vm.box_version = "1.0"
     cfg.vm.hostname = "ts"
 
     cfg.vm.communicator = "winrm"
@@ -152,6 +159,34 @@ Vagrant.configure("2") do |config|
       vb.gui = true
       vb.customize ["modifyvm", :id, "--memory", 768]
       vb.customize ["modifyvm", :id, "--cpus", 1]
+      vb.customize ["modifyvm", :id, "--vram", "32"]
+      vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+      vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
+    end
+  end
+
+  config.vm.define "desktop", autostart: false do |cfg|
+    cfg.vm.box = "lookingforlemons/windows10-1803"
+    cfg.vm.box_version = "1.0"
+
+    cfg.vm.hostname = "desktop"
+
+    cfg.vm.communicator = "winrm"
+    cfg.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
+    cfg.vm.network :forwarded_port, guest: 22, host: 2222, id: "ssh", auto_correct: true
+    cfg.vm.network :forwarded_port, guest: 3389, host: 3389, id: "rdp", auto_correct: true
+    cfg.vm.network :private_network, ip: "192.168.38.15", gateway: "192.168.38.1"
+
+    cfg.vm.provision "shell", path: "scripts/fix-second-network.ps1", privileged: false, args: "-ip 192.168.38.15 -dns 192.168.38.2"
+    cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
+    cfg.vm.provision "reload"
+    cfg.vm.provision "shell", path: "scripts/provision.ps1", privileged: false
+    cfg.vm.provision "reload"
+
+    cfg.vm.provider "virtualbox" do |vb, override|
+      vb.gui = true
+      vb.customize ["modifyvm", :id, "--memory", 2048]
+      vb.customize ["modifyvm", :id, "--cpus", 2]
       vb.customize ["modifyvm", :id, "--vram", "32"]
       vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
       vb.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
